@@ -15,6 +15,10 @@ ds_Fe = xr.open_dataset(f_Fe)
 lat_bins = np.arange(90, -90, -0.5)
 lon_bins = np.arange(-180, 180, 0.5)
 
+# Calculate the bin centers for real lat/lon values
+lat_centers = lat_bins[:-1] + 0.25
+lon_centers = lon_bins[:-1] + 0.25
+
 # Assign bins to both datasets
 ds_Al['lat_bin'] = xr.DataArray(np.digitize(ds_Al['lat'], lat_bins) - 1, dims="lat")
 ds_Al['lon_bin'] = xr.DataArray(np.digitize(ds_Al['lon'], lon_bins) - 1, dims="lon")
@@ -35,14 +39,10 @@ ds_combined['lon_bin'] = ds_Al['lon_bin']
 # Group and average by bins using mean (proper spatial averaging)
 regridded = ds_combined.groupby(['lat_bin', 'lon_bin']).mean(skipna=True)
 
-# Calculate the bin centers for real lat/lon values
-lat_centers = lat_bins[:-1] + 0.25
-lon_centers = lon_bins[:-1] + 0.25
-
 # Assign the real lat/lon coordinates
 regridded = regridded.assign_coords({
-    "lat": ("lat_bin", lat_centers[regridded.lat_bin.values]),
-    "lon": ("lon_bin", lon_centers[regridded.lon_bin.values])
+    "lat": ("lat_bin", lat_centers[ds_combined['lat_bin'].values]),
+    'lon': ('lon_bin', lon_centers[ds_combined['lon_bin'].values])
 })
 
 # Calculate the total in mmol/m2

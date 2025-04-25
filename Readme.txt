@@ -5,10 +5,10 @@ To calculate the following factors, we need the original inputs as follows:
 1. (Al+Fe)ox: Oxalate extractable AL and Fe contents (mmol/kg)
    The data is from Ren et al.(2024) (https://doi.org/10.1111/gcb.17576) and is available on: https://zenodo.org/records/13995030
    Here we: 
-      1-1 Sum up the (Al+Fe)ox of 0-20 cm and 20-40 cm at 1km (unit = kg/m2)
-      1-2 Upscale to 0.5 degree
+      1-1 Sum up the Al-oxalate and Fe-oxalate for top 40cm at 1km (unit = kg/m2)
+      1-2 Upscale to 0.5 degree, and sum up to (Al+Fe)ox (unit = mmol/m2)
       1-3 Transform the unit to the mmol/kg by dividing soil bulk density from HWSD:
-          (Al+Fe)ox [mmol/kg] = (Al+Fe)ox [kg/m2] / 
+          (Al+Fe)ox [mmol/kg] = (Al+Fe)ox [mmol/m2] * area_of_each_pixel [m2] / bulk_density [kg/dm-1] * topsoil_depth [4dm]
    
 
 2. PC ratio of soil organic matter: [-]
