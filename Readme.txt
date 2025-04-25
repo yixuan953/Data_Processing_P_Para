@@ -4,8 +4,26 @@ To calculate the following factors, we need the original inputs as follows:
 
 1. (Al+Fe)ox: Oxalate extractable AL and Fe contents (mmol/kg)
    The data is from Ren et al.(2024) (https://doi.org/10.1111/gcb.17576) and is available on: https://zenodo.org/records/13995030
-2. Soil total P 
-   The data is from He et al.(2021) (https://essd.copernicus.org/articles/13/5831/2021/) and is available on: https://figshare.com/articles/figure/Global_patterns_and_drivers_of_soil_total_phosphorus_concentration/14583375
+   Here we: 
+      1-1 Sum up the (Al+Fe)ox of 0-20 cm and 20-40 cm at 1km (unit = kg/m2)
+      1-2 Upscale to 0.5 degree
+      1-3 Transform the unit to the mmol/kg by dividing soil bulk density from HWSD:
+          (Al+Fe)ox [mmol/kg] = (Al+Fe)ox [kg/m2] / 
+   
+
+2. PC ratio of soil organic matter: [-]
+   The calculation method is from Tipping et al. (2016) based on global soil organic matter analysis: https://link.springer.com/article/10.1007/s10533-016-0247-z#Sec5
+   PC_ratio = PC_npSOM * Fnpsom + PC_nrSOM * Fnrsom 
+   Here:
+      - PC_npSOM = 0.0011
+      - PR_npSOM = 0.016
+      if soc < 0.1: Fnpsom = 0, Fnrsom = 1; 
+      if soc > 50.: Fnpsom = 1, Fnrsom = 0; 
+      if 0.1<= soc <= 50.: 
+         Fnpsom = log10(soc/0.1) / log10(50/0.1)
+         Fnrsom = 1 - Fnpsom
+   The soc data is from HWSD at https://www.hydroshare.org/resource/1361509511e44adfba814f6950c6e742/
+
 3. P Olsen
    The data is from (2023 ) (https://doi.org/10.1038/s41597-023-02022-4) and is available on: https://figshare.com/articles/dataset/Global_Available_Soil_Phosphorus_Database/14241854
 
@@ -15,7 +33,7 @@ To calculate the following factors, we need the original inputs as follows:
 2. Maximum stable P pool [mmol/kg] = 1/3 * (Al+Fe)ox
 
 --------------- P transfer constant -------------
-1. KF: Freudlich constant of the stable pool = 0.5 * ((Al+Fe)ox - Lmax)/90
+1. KF: Freudlich constant of the stable pool = 0.5 * ((Al+Fe)ox - Lmax)/90**nP
 2. miu_DisS = 0.0014
 3. miu_SDis* = 
     - Sand: 2 * 10-6
