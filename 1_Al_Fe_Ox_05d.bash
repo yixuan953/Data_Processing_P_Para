@@ -21,4 +21,4 @@ module load python/3.12.0
 python /lustre/nobackup/WUR/ESG/zhou111/Code/Data_Processing/P_cycling_Paramters/1_2_Res_Trans_Upscale_05d.py
 
 # 1_3 Transform the data unit from kg/m2 to mmol/kg soil mass by dividing the output of 1_2 with bulk density
-# python /lustre/nobackup/WUR/ESG/zhou111/Code/Data_Processing/P_cycling_Paramters/1_3_Unit_Transf.py
+python /lustre/nobackup/WUR/ESG/zhou111/Code/Data_Processing/P_cycling_Paramters/1_3_Unit_Transf.py
