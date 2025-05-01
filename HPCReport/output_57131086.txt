@@ -1,3 +1,0 @@
-Regridded .nc file has been saved successfully at: /lustre/nobackup/WUR/ESG/zhou111/Data/Processed/Soil/Al_Fe_Ox_top40cm_05d.nc
-(Al+Fe)ox [mmol/kg] has been calculated and saved to: /lustre/nobackup/WUR/ESG/zhou111/Data/Para_P_Cycling/Al_Fe_ox_05d.nc
-P Olsen [mmol/kg] has been saved to: /lustre/nobackup/WUR/ESG/zhou111/Data/Para_P_Cycling/POlsen_05d.nc

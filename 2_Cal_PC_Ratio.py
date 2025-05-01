@@ -53,7 +53,7 @@ ds_pc_ratio["PC_ratio"].attrs["units"] = "-"
 ds_pc_ratio["PC_ratio"].attrs["description"] = f"PC_ratio = PC_npSOM * Fnpsom + PC_nrSOM * Fnrsom"
 
 # Save to netCDF file
-output_file = "/lustre/nobackup/WUR/ESG/zhou111/Data/Para_P_Cycling/PCratio_05d.nc"
+output_file = "/lustre/nobackup/WUR/ESG/zhou111/Data/Para_P_Cycling/PC_Ratio_05d.nc"
 ds_pc_ratio.to_netcdf(output_file)
 
 print(f"PC ratio calculations saved to: {output_file}")

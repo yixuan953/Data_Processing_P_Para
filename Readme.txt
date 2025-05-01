@@ -27,19 +27,24 @@ The scripts in this folder is used to calculate the parameters that are related 
    1) Firstly upscale to 0.5 degree;
    2) Transform the unit to mmol/kg by dividing 30.97
 
+
+The above mentioned parameters will be used for following calculations:
+
 --------------- Maximum labile and stable pool -------------
-1. Maximum labile P pool [mmol/kg] = 1/6 * (Al+Fe)ox
+1. Maximum labile P pool (Lmax) [mmol/kg] = 1/6 * (Al+Fe)ox
 2. Maximum stable P pool [mmol/kg] = 1/3 * (Al+Fe)ox
 
 --------------- P transfer constant -------------
-1. KF: Freudlich constant of the stable pool = 0.5 * ((Al+Fe)ox - Lmax)/90**nP
-2. miu_DisS = 0.0014
-3. miu_SDis* = 
-    - Sand: 2 * 10-6
-    - Clay: 44 * 10-6
-    - Loam: Take the average
+KF: Freudlich constant of the stable pool = 0.5 * ((Al+Fe)ox - Lmax)/90**nP
 
 ---------------------- Other Factors -----------------------
 1. Humification coefficient (hc, unit: -): 
    (1-hc) = how much organic input (manure + residue) will be available for crop uptake in inorganic format
-   The coefficent could be found from: https://edepot.wur.nl/541822  
+   The coefficent could be found from: https://edepot.wur.nl/541822 
+
+2. miu_DisS = 0.0014
+
+3. miu_SDis* = 
+    - Sand: 2 * 10-6
+    - Clay: 44 * 10-6
+    - Loam: Take the average 

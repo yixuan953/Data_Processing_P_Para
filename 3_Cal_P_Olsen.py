@@ -1,48 +1,89 @@
-# This code is used to calculate the P Olsen at 0.5 degree using the data from McDowell et al.(2023): https://doi.org/10.1038/s41597-023-02022-4
-
 import rasterio
 import numpy as np
 import os
 import xarray as xr
 from scipy.ndimage import zoom
+from rasterio.warp import calculate_default_transform, reproject, Resampling
 
-# Path for required data
+# Path for required and output data
 Polsen_file = '/lustre/nobackup/WUR/ESG/zhou111/Data/Raw/Nutri/P_pool/OlsenP/OlsenP_kgha1_World_Aug2022_ver_COG.tif'
-# soil_file = "/lustre/nobackup/WUR/ESG/zhou111/Data/Raw/Soil/hwsd_soil_data_on_cropland.nc"
-# ds_soil = xr.open_dataset(soil_file)
-# bd = ds_soil["bulk_density"] # Unit: kg/dm3
-
-# Other directories
 process_dir = '/lustre/nobackup/WUR/ESG/zhou111/Data/Processed/Soil' 
 output_dir = '/lustre/nobackup/WUR/ESG/zhou111/Data/Para_P_Cycling'
 
+# Open the original .tiff file
 with rasterio.open(Polsen_file) as src_Polsen:
-    Polsen = src_Polsen.read(1).astype(float) # Unit: mg/kg
+    # Read the data as float
+    Polsen = src_Polsen.read(1).astype(float)  # Unit: mg/kg
+    crs = src_Polsen.crs
     transform = src_Polsen.transform
-    original_lon= np.linspace(src_Polsen.bounds.left, src_Polsen.bounds.right, src_Polsen.width)
-    original_lat = np.linspace(src_Polsen.bounds.top, src_Polsen.bounds.bottom, src_Polsen.height)
+    
+    # Replace values greater than 1e5 with NaN (missing values)
+    Polsen[Polsen > 1e5] = np.nan
+    
+    # Define target CRS (WGS84)
+    dst_crs = 'EPSG:4326'
+    
+    # Calculate the transform for the reprojected data
+    transform_reproj, width_reproj, height_reproj = calculate_default_transform(
+        crs, dst_crs, src_Polsen.width, src_Polsen.height, *src_Polsen.bounds
+    )
+    
+    # Create an empty array for the reprojected data
+    reprojected_data = np.empty((height_reproj, width_reproj), dtype=np.float32)
+    
+    # Reproject the data
+    reproject(
+        source=Polsen,
+        destination=reprojected_data,
+        src_transform=src_Polsen.transform,
+        src_crs=crs,
+        dst_transform=transform_reproj,
+        dst_crs=dst_crs,
+        resampling=Resampling.bilinear  # Using bilinear for better quality
+    )
 
-# Desired resolution
+# Create target latitude and longitude grid with 0.5 degree resolution
 target_lat = np.arange(89.75, -90, -0.5)   # From 89.75 to -89.75
 target_lon = np.arange(-179.75, 180, 0.5)  # From -179.75 to 179.75
 
-zoom_y = len(target_lat) / Polsen.shape[0]
-zoom_x = len(target_lon) / Polsen.shape[1]
+# Calculate the resolution of the reprojected data
+res_lat = abs(transform_reproj[4])  # y resolution
+res_lon = transform_reproj[0]       # x resolution
 
-data_resampled = zoom(Polsen, (zoom_y, zoom_x), order=1)  # order=1: bilinear interpolation
+# Calculate the number of pixels needed for 0.5 degree
+new_height = int(transform_reproj[5] + height_reproj * transform_reproj[4] - transform_reproj[5]) / 0.5
+new_width = int(transform_reproj[2] + width_reproj * transform_reproj[0] - transform_reproj[2]) / 0.5
+
+# Calculate zoom factors for resampling
+zoom_y = len(target_lat) / reprojected_data.shape[0]
+zoom_x = len(target_lon) / reprojected_data.shape[1]
+
+# Convert P Olsen from mg/kg to mmol/kg (if needed)
+Polsen_mol = reprojected_data / 30.97  # Conversion from mg P to mmol P
+
+# Perform bilinear resampling (zooming)
+data_resampled = zoom(Polsen_mol, (zoom_y, zoom_x), order=1)  # order=1 for bilinear interpolation
 
 # Create xarray Dataset
 ds = xr.Dataset(
     {
-        "P Olsen": (("lat", "lon"), data_resampled)
+        "P_Olsen": (("lat", "lon"), data_resampled)
     },
     coords={
         "lat": target_lat,
         "lon": target_lon
     }
 )
+ds["P_Olsen"].attrs["long_name"] = "P Olsen upscaled from 1 km"
+ds["P_Olsen"].attrs["units"] = "mmol/kg"
+ds["P_Olsen"].attrs["description"] = f"P Olsen [mmol/kg] = P Olsen [mg/kg] / 30.97"
 
-# Save to NetCDF
-output_nc = os.path.join(output_dir, f"POlsen_05d.nc")
+# Ensure the output directory exists
+os.makedirs(output_dir, exist_ok=True)
+
+# Save the resulting dataset as a NetCDF file
+output_nc = os.path.join(output_dir, "POlsen_05d.nc")
 ds.to_netcdf(output_nc)
-print(f"P Olsen [mmol/kg] has been saved to: {output_nc}")
+
+# Output message
+print(f"P Olsen data has been successfully saved to: {output_nc}")
