@@ -13,7 +13,7 @@ The scripts in this folder is used to calculate the parameters that are related 
    PC_ratio = PC_npSOM * Fnpsom + PC_nrSOM * Fnrsom 
    Here:
       - PC_npSOM = 0.0011
-      - PR_npSOM = 0.016
+      - PC_nrSOM = 0.016
       if soc < 0.1: Fnpsom = 0, Fnrsom = 1; 
       if soc > 50.: Fnpsom = 1, Fnrsom = 0; 
       if 0.1<= soc <= 50.: 
